@@ -1,0 +1,52 @@
+# [START kubernetes_deployment]
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  labels:
+    app: auth
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth-app
+        image: gcr.io/game-tv-website-qa/auth
+        imagePullPolicy: Always
+        env:
+            - name: JWT_SECRET_KEY
+              value: "ADLNASLDKN123!@#AS"
+            - name: CLUSTER_URL
+              value: "discord-cluster.b9ngb.mongodb.net"
+            - name: MONGO_USER
+              value: "demo"
+            - name: MONGO_PASSWORD
+              value: "abc%40123"
+            - name: DB_NAME
+              value: "auth"
+        ports:
+        - containerPort: 5000 
+# [END kubernetes_deployment]
+
+---
+# [START service]
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  labels:
+    app: auth
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: auth
+# [END service]
